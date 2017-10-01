@@ -7,17 +7,11 @@ using System.Threading;
 
 public class CreateSpheres : MonoBehaviour {
     public long numDataPoints = 1000; // Pick how many data points to display
-    public int j = 0;
     public static GameObject[] dataPointArr; // Declare array of data points
     private static float maxhex = 255;
 
     // UDP receiving objects
-    UdpClient client;
-    IPEndPoint endPoint;
     public int port = 2368;
-    public string hostName = "10.42.0.201";
-    public GameObject car;
-    public int stepNum;
     Thread listener;
     Queue pQueue = Queue.Synchronized(new Queue());
 
@@ -25,18 +19,19 @@ public class CreateSpheres : MonoBehaviour {
     {
         dataPointArr = new GameObject[numDataPoints];
 
-        // Initialize UDP reader
-        IPAddress ip = IPAddress.Any;//IPAddress.Parse(hostName);
-        Debug.Log(ip.ToString());
-        endPoint = new IPEndPoint(ip, port);
-        client = new UdpClient(endPoint);
+        long i; // Counter
+        for (i = 0; i < numDataPoints; i++)
+        {
+            dataPointArr[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            dataPointArr[i].transform.position = new Vector3(0, 0, 0);
+        }
+
+        // Initialize UDP reader thread
         listener = new Thread(new ThreadStart(Translater))
         {
             IsBackground = true
         };
         listener.Start();
-
-        Debug.Log("Setup done");
     }
 
     void Update()
@@ -46,7 +41,7 @@ public class CreateSpheres : MonoBehaviour {
             if (pQueue.Count > 0)
             {
                 VeloPacket p = (VeloPacket)pQueue.Dequeue();
-                Debug.Log("Packet received!");
+                //Debug.Log((string)pQueue.Dequeue());
                 // Draw circles here
                 //UpdateSphere(j, j, j, j);
             }
@@ -59,35 +54,40 @@ public class CreateSpheres : MonoBehaviour {
         {
             listener.Abort();
         }
-        client.Close();
     }
 
     void Translater()
     {
-        Byte[] data = new byte[0];
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
+        UdpClient client = new UdpClient(port);
+        Byte[] data;
         while (true)
         {
             try
             {
                 data = client.Receive(ref endPoint);
                 pQueue.Enqueue(new VeloPacket(data));
+                //pQueue.Enqueue(endPoint.Address + ":" + endPoint.Port);
             }
-            catch (Exception err)
+            catch
             {
                 client.Close();
                 return;
             }
+            Thread.Sleep(100);
         }
     }
 
-    public static void update_sphere(long id, float xpos, float ypos, float zpos, float intensity)
+    public static void UpdateSphere(long id, float xpos, float ypos, float zpos, float intensity)
     {
         dataPointArr[id].transform.position = new Vector3(xpos, ypos, zpos);
 
         Color intensityColor = new Color(0, intensity / maxhex, 0, 1);
         dataPointArr[id].gameObject.GetComponent<Renderer>().material.color = intensityColor;
     }
-}public class VeloPacket
+}
+
+public class VeloPacket
 {
     Byte[] raw;
 
