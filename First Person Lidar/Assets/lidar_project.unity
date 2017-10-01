@@ -185,11 +185,6 @@ GameObject:
   - component: {fileID: 2056350071}
   - component: {fileID: 2056350070}
   - component: {fileID: 2056350069}
-  - component: {fileID: 2056350068}
-  - component: {fileID: 2056350074}
-  - component: {fileID: 2056350075}
-  - component: {fileID: 2056350076}
-  - component: {fileID: 2056350077}
   - component: {fileID: 2056350078}
   m_Layer: 0
   m_Name: Main Camera
@@ -198,18 +193,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2056350068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2056350067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e15ba2a7df8da414aba0e6937d0f8da6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  newVertices: []
 --- !u!81 &2056350069
 AudioListener:
   m_ObjectHideFlags: 0
@@ -280,54 +263,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2056350074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2056350067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da1396af5e7b89340bc6f315846198ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2056350075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2056350067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71b6cb734bf857d448ab2f1e352e8e8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2056350076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2056350067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae5cdd96e0471a746bdf12f2dacd3caa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numDataPoints: 5
-  j: 0
---- !u!114 &2056350077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2056350067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae5cdd96e0471a746bdf12f2dacd3caa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numDataPoints: 5
-  j: 0
 --- !u!114 &2056350078
 MonoBehaviour:
   m_ObjectHideFlags: 0
