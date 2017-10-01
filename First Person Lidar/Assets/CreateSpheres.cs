@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Threading;
 
 public class CreateSpheres : MonoBehaviour {
-    public long numDataPoints = 1000; // Pick how many data points to display
+    public long numDataPoints = 12*32; // Pick how many data points to display
     public static GameObject[] dataPointArr; // Declare array of data points
     private static float maxhex = 255;
 
@@ -43,7 +43,10 @@ public class CreateSpheres : MonoBehaviour {
                 VeloPacket p = (VeloPacket)pQueue.Dequeue();
                 //Debug.Log((string)pQueue.Dequeue());
                 // Draw circles here
-                //UpdateSphere(j, j, j, j);
+                for (int i = 0; i < numDataPoints; i++)
+                {
+                    UpdateSphere(i, p.x[i], p.y[i], p.z[i], 0);
+                }
             }
         }
     }
@@ -74,15 +77,16 @@ public class CreateSpheres : MonoBehaviour {
                 client.Close();
                 return;
             }
-            Thread.Sleep(100);
+            Thread.Sleep(10);
         }
     }
 
     public static void UpdateSphere(long id, float xpos, float ypos, float zpos, float intensity)
     {
         dataPointArr[id].transform.position = new Vector3(xpos, ypos, zpos);
+        dataPointArr[id].transform.localScale = new Vector3(1, 1, 1);
 
-        Color intensityColor = new Color(0, intensity / maxhex, 0, 1);
+        Color intensityColor = new Color(0, intensity / maxhex, zpos % 255, 1);
         dataPointArr[id].gameObject.GetComponent<Renderer>().material.color = intensityColor;
     }
 }
@@ -120,11 +124,11 @@ public class VeloPacket
         for (int i = 0; i < 12*32; i++)
         {
             int index = 100 * (i / 32) + 3 * (i % 32) + 4;
-            float r = BitConverter.ToUInt16(data, index);
+            float r = BitConverter.ToUInt16(data, index) / 500f;
             intensity[i] = data[index + 2];
-            x[i] = r * (float)Math.Cos(w[i % 16]) * (float)Math.Sin(a[i / 16]);
-            y[i] = r * (float)Math.Cos(w[i % 16]) * (float)Math.Cos(a[i / 16]);
-            z[i] = r * (float)Math.Sin(w[i % 16]);
+            y[i] = r * (float)Math.Cos(w[i % 16]) * (float)Math.Sin(a[i / 16]);
+            z[i] = -r * (float)Math.Cos(w[i % 16]) * (float)Math.Cos(a[i / 16]);
+            x[i] = r * (float)Math.Sin(w[i % 16]);
         }
     }
 }
