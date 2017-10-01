@@ -6,9 +6,11 @@ using System.Net.Sockets;
 using System.Threading;
 
 public class CreateSpheres : MonoBehaviour {
-    public long numDataPoints = 12*32; // Pick how many data points to display
+    public long numDataPoints = 12*32*2000; // Pick how many data points to display
     public static GameObject[] dataPointArr; // Declare array of data points
     private static float maxhex = 255;
+    private static int point = 0;
+    private static float lastAzimuth = 0;
 
     // UDP receiving objects
     public int port = 2368;
@@ -41,12 +43,19 @@ public class CreateSpheres : MonoBehaviour {
             if (pQueue.Count > 0)
             {
                 VeloPacket p = (VeloPacket)pQueue.Dequeue();
-                //Debug.Log((string)pQueue.Dequeue());
-                // Draw circles here
-                for (int i = 0; i < numDataPoints; i++)
+
+                if (p.azimuth < lastAzimuth)
                 {
-                    UpdateSphere(i, p.x[i], p.y[i], p.z[i], 0);
+                    point = 0;
                 }
+                lastAzimuth = p.azimuth;
+
+                // Draw spheres
+                for (int i = 0; i < p.x.Length; i++)
+                {
+                    UpdateSphere(point+i, p.x[i], p.y[i], p.z[i], p.r[i]);
+                }
+                point += p.x.Length;
             }
         }
     }
@@ -84,9 +93,9 @@ public class CreateSpheres : MonoBehaviour {
     public static void UpdateSphere(long id, float xpos, float ypos, float zpos, float intensity)
     {
         dataPointArr[id].transform.position = new Vector3(xpos, ypos, zpos);
-        dataPointArr[id].transform.localScale = new Vector3(1, 1, 1);
+        dataPointArr[id].transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
 
-        Color intensityColor = new Color(0, intensity / maxhex, zpos % 255, 1);
+        Color intensityColor = new Color(0, intensity / maxhex, 0, 1);
         dataPointArr[id].gameObject.GetComponent<Renderer>().material.color = intensityColor;
     }
 }
@@ -98,6 +107,7 @@ public class VeloPacket
     public float[] x;
     public float[] y;
     public float[] z;
+    public float[] r;
 
     public VeloPacket(Byte[] data)
     {
@@ -106,6 +116,7 @@ public class VeloPacket
         x = new float[12 * 32];
         y = new float[12 * 32];
         z = new float[12 * 32];
+        r = new float[12 * 32];
         ReadPacket(data);
     }
 
@@ -113,22 +124,28 @@ public class VeloPacket
     {
         // Read all 12 azimuths
         float[] a = new float[24];
-        a[0] = BitConverter.ToUInt16(data, 2) / 100f;
+        a[0] = BitConverter.ToUInt16(data, 2) / 100f * (float)Math.PI / 180f - (float)Math.PI;
         azimuth = a[0];
+        float[] w = {-15f, 1f, -13f, 3f, -11f, 5f, -9f, 7f, -7f, 9f, -5f, 11f, -3f, 13f, -1f, 15f};
+        for (int i = 0; i < w.Length; i++)
+        {
+            w[i] = w[i] * (float)Math.PI / 180f; // Convert to radians
+        }
         for (int i = 1; i < 11; i++)
         {
-            a[i*2] = BitConverter.ToUInt16(data, i*100+2) / 100f;
+            a[i*2] = BitConverter.ToUInt16(data, i*100+2) / 100f * (float)Math.PI / 180f - (float)Math.PI;
             a[i * 2 - 1] = (a[i * 2 - 2] + a[i * 2]) / 2;
+            
         }
-        int[] w = {-15, 1, -13, 3, -11, 5, -9, 7, -7, 9, -5, 11, -3, 13, -1, 15};
+        
         for (int i = 0; i < 12*32; i++)
         {
             int index = 100 * (i / 32) + 3 * (i % 32) + 4;
-            float r = BitConverter.ToUInt16(data, index) / 500f;
+            r[i] = BitConverter.ToUInt16(data, index) / 500f;
             intensity[i] = data[index + 2];
-            y[i] = r * (float)Math.Cos(w[i % 16]) * (float)Math.Sin(a[i / 16]);
-            z[i] = -r * (float)Math.Cos(w[i % 16]) * (float)Math.Cos(a[i / 16]);
-            x[i] = r * (float)Math.Sin(w[i % 16]);
+            y[i] = r[i] * (float)Math.Cos(w[i % 16]) * (float)Math.Sin(a[i / 16]);
+            z[i] = -r[i] * (float)Math.Cos(w[i % 16]) * (float)Math.Cos(a[i / 16]);
+            x[i] = r[i] * (float)Math.Sin(w[i % 16]);
         }
     }
 }
