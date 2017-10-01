@@ -274,5 +274,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae5cdd96e0471a746bdf12f2dacd3caa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numDataPoints: 1000
-  j: 0
+  numDataPoints: 384
+  port: 2368
